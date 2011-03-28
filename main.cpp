@@ -45,9 +45,9 @@ int main(int argc, char **argv) {
     }
     #endif
 
-    #ifdef Q_WS_MAC
+    #ifndef Q_WS_WIN
     QFont font = QApplication::font();
-    font.setPointSize(11);
+    font.setPixelSize(11);
     QApplication::setFont(font);
     #endif
 

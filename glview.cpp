@@ -112,26 +112,40 @@ void GLView::setPixels(int w, int h, GLenum format, GLenum type, void *pixels) {
         }
 
         float *noise = new float[w * h];
-        {   
+        {
             srand(1);
             float *p = noise;
             for (int j = 0; j < h; ++j) {
                 for (int i = 0; i < w; ++i) {
-                    *p++ = 0.5f + 2.0f * ((float)rand() / RAND_MAX - 0.5); 
+                    *p++ = 0.5f + 2.0f * ((float)rand() / RAND_MAX - 0.5);
                 }
             }
             p = noise;
             for (int j = 0; j < h; ++j) {
-                *p++ = (3*p[0] + p[1]) / 4;
-                for (int i = 1; i < w-1; ++i) *p++ = (p[-1] + 2*p[0] + p[1]) / 4;
-                *p++ = (p[-1] + 3*p[0]) / 4;
+                *p = (3*p[0] + p[1]) / 4;
+                ++p;
+                for (int i = 1; i < w-1; ++i) {
+                    *p = (p[-1] + 2*p[0] + p[1]) / 4;
+                    ++p;
+                }
+                *p = (p[-1] + 3*p[0]) / 4;
+                ++p;
             }
             p = noise;
-            for (int i = 0; i < w; ++i) *p++ = (3*p[0] + p[w]) / 4;
-            for (int j = 1; j < h-1; ++j) {
-                for (int i = 0; i < w; ++i) *p++ = (p[-w] + 2*p[0] + p[w]) / 4;
+            for (int i = 0; i < w; ++i) {
+                *p = (3*p[0] + p[w]) / 4;
+                ++p;
             }
-            for (int i = 0; i < w; ++i) *p++ = (p[-w] + 3*p[0]) / 4;
+            for (int j = 1; j < h-1; ++j) {
+                for (int i = 0; i < w; ++i) {
+                    *p = (p[-w] + 2*p[0] + p[w]) / 4;
+                    ++p;
+                }
+            }
+            for (int i = 0; i < w; ++i) {
+                *p = (p[-w] + 3*p[0]) / 4;
+                ++p;
+            }
         }
         glBindTexture(GL_TEXTURE_2D, m_tex[TEX_NOISE]);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE16F_ARB, w, h, 0, GL_LUMINANCE, GL_FLOAT, noise);
@@ -512,7 +526,7 @@ void GLView::process() {
     mainWindow->pf->setText(QString("%1 ms / %2 fps / %3").arg(s * 1000, 0, 'g', 5)
                                                           .arg(1.0 / s, 0, 'g', 3)
                                                           .arg(m_processN));
-    #endif WIN32
+    #endif
 
     updateGL();
 }

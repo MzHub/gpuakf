@@ -19,15 +19,15 @@
 MainWindow::MainWindow() {
     setupUi(this);
 
+    #ifdef Q_WS_MAC
     QList<QWidget*> widgets = this->findChildren<QWidget*>();
     for (int i = 0; i < widgets.size(); ++i) {
         QWidget *w = widgets.at(i);
-        #ifdef Q_WS_MAC
         if (w->inherits("QLabel")) {
             w->setFont(QApplication::font());
         }
-        #endif
     }
+    #endif
 
     actionQuit->setShortcut(QKeySequence(Qt::Key_Escape));
     m_algorithm = algorithm->currentIndex();

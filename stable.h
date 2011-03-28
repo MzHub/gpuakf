@@ -9,8 +9,8 @@
 #endif
 
 #include <cassert>
-#include "GLee.h"
 #include <QtGui>
+#include "GLee.h"
 #include <QtOpenGL>
 
 #ifdef min
