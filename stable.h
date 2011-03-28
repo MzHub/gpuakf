@@ -9,9 +9,16 @@
 #endif
 
 #include <cassert>
-#include <QtGui>
+
+#ifdef Q_WS_X11
+#include <QtGui/QtGui>
 #include "GLee.h"
+#include <QtOpenGL/QtOpenGL>
+#else
+#include "GLee.h"
+#include <QtGui>
 #include <QtOpenGL>
+#endif
 
 #ifdef min
 #undef min
