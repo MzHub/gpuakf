@@ -18,6 +18,17 @@
 
 MainWindow::MainWindow() {
     setupUi(this);
+
+    QList<QWidget*> widgets = this->findChildren<QWidget*>();
+    for (int i = 0; i < widgets.size(); ++i) {
+        QWidget *w = widgets.at(i);
+        #ifdef Q_WS_MAC
+        if (w->inherits("QLabel")) {
+            w->setFont(QApplication::font());
+        }
+        #endif
+    }
+
     actionQuit->setShortcut(QKeySequence(Qt::Key_Escape));
     m_algorithm = algorithm->currentIndex();
 
@@ -167,25 +178,35 @@ void MainWindow::on_actionAbout_triggered() {
     msgBox.setIcon(QMessageBox::Information);
     msgBox.setText("<b>Anisotropic Kuwahara Filtering on the GPU</b>");
     msgBox.setInformativeText(
-        "<html><body>Copyright (C) 2009 Hasso-Plattner-Institut,<br/>" \
-        "Fachgebiet Computergrafische Systeme &lt;" \
-        "<a href='http://www.hpi3d.de'>www.hpi3d.de</a>&gt;<br/><br/>" \
-        "Author: Jan Eric Kyprianidis &lt;" \
-        "<a href='http://www.kyprianidis.com'>www.kyprianidis.com</a>&gt;<br/>" \
-        "Date: " __DATE__ "<br/><br/>" \
+        "<html><body>" \
+        "Copyright (C) 2009-2011 Computer Graphics Systems Group at " \
+        "the Hasso-Plattner-Institut, Potsdam, Germany &lt;<a href='http://www.hpi3d.de'>www.hpi3d.de</a>&gt;" \
+        "<br/><br/>" \
+        "Author: Jan Eric Kyprianidis &lt;<a href='http://www.kyprianidis.com'>www.kyprianidis.com</a>&gt;<br/>" \
+        "Date: " __DATE__ "<br/><br/>"
+        "This program is free software: you can redistribute it and/or modify " \
+        "it under the terms of the GNU General Public License as published by " \
+        "the Free Software Foundation, either version 3 of the License, or " \
+        "(at your option) any later version.<br/><br/>" \
+        "This program is distributed in the hope that it will be useful, " \
+        "but WITHOUT ANY WARRANTY; without even the implied warranty of " \
+        "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the " \
+        "GNU General Public License for more details."
+        "<br/><br/>" \
         "Related Publications:" \
         "<ul><li>" \
-        "Kyprianidis, J. E., Kang, H., &amp; Döllner, J. (2010). " \
+        "Kyprianidis, J. E., Kang, H., &amp; D&ouml;llner, J. (2009). " \
+        "Image and Video Abstraction by Anisotropic Kuwahara Filtering. " \
+        "<em>Computer Graphics Forum</em> 28, 7. " \
+        "(Special issue on Pacific Graphics 2009)" \
+        "</li><li>" \
+        "Kyprianidis, J. E., Kang, H., &amp; D&ouml;llner, J. (2010). " \
         "Anisotropic Kuwahara Filtering on the GPU. " \
         "In W. Engel (Ed.), <em>GPU Pro - Advanced Rendering Techniques</em>. " \
         "AK Peters." \
-        "</li><li>" \
-        "Kyprianidis, J. E., Kang, H., &amp; Döllner, J. (2009). " \
-        "Image and Video Abstraction by Anisotropic Kuwahara Filtering. " \
-        "<em>Computer Graphics Forum</em> 28, 7. " \
-        "Special issue on Pacific Graphics 2009." \
         "</li></ul>" \
-        "Test image courtesy of Law Keven.</body></html>"
+        "Test image courtesy of Law Keven." \
+        "</body></html>"
 	);
     msgBox.setStandardButtons(QMessageBox::Ok);
     msgBox.exec();
