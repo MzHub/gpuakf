@@ -1,5 +1,5 @@
 #!/bin/sh
-if [ `uname` == "Darwin" ]; then
+if [ `uname` = "Darwin" ]; then
 	rm -rf gpuakf.app gpuakf.dmg
 	qmake -spec macx-g++ -config release
 	make

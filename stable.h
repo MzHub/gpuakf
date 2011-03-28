@@ -10,10 +10,12 @@
 
 #include <cassert>
 
+#include <QtCore>
+
 #ifdef Q_WS_X11
-#include <QtGui/QtGui>
+#include <QtGui>
 #include "GLee.h"
-#include <QtOpenGL/QtOpenGL>
+#include <QtOpenGL>
 #else
 #include "GLee.h"
 #include <QtGui>
