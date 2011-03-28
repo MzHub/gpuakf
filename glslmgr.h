@@ -21,7 +21,7 @@
 class GLSLMgr : public QDialog, public Ui_GLSLMgr {
     Q_OBJECT
 public:
-	GLSLMgr(QGLWidget *parent);
+    GLSLMgr(QGLWidget *parent);
     ~GLSLMgr();
 
     QGLWidget* parent() { return (QGLWidget*)QDialog::parent(); }
@@ -29,7 +29,7 @@ public:
     int buildStatus() const { return m_buildStatus; }
 
     bool initialize();
-	void replaceInSource(const QString& pattern, const QString& text);
+    void replaceInSource(const QString& pattern, const QString& text);
 
 public slots:
     void build();
@@ -44,7 +44,7 @@ private:
     QPlainTextEdit *m_logText;
     QList<QPlainTextEdit*> m_srcText;
     QPushButton *m_build;
-	QMap<QString, QGLShaderProgram*> m_prog;
+    QMap<QString, QGLShaderProgram*> m_prog;
 };
 
 #endif

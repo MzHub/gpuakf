@@ -101,17 +101,17 @@ quicktime_player* quicktime_player::open( const char *path ) {
     CFStringRef cfPath = CFStringCreateWithCString(NULL, pathStd.c_str(), kCFStringEncodingISOLatin1);
     err = QTNewDataReferenceFromFullPathCFString(cfPath, (QTPathStyle)kQTNativeDefaultPathStyle, 0, &dataRef, &dataRefType);
     CFRelease(cfPath);
-	if (err != noErr) {
-		delete m;
+    if (err != noErr) {
+        delete m;
         return NULL;
-	}
+    }
 
     err = NewMovieFromDataRef(&m->movie, newMovieActive, &resID, dataRef, dataRefType);
     DisposeHandle(dataRef);
-	if (err != noErr) {
-		delete m;
+    if (err != noErr) {
+        delete m;
         return NULL;
-	}	
+    }   
 
     m->track = GetMovieIndTrackType(m->movie, 1, VisualMediaCharacteristic, movieTrackCharacteristic);
     m->media = GetTrackMedia(m->track);
@@ -227,9 +227,9 @@ int quicktime_player::get_frame_count() {
 
 
 float quicktime_player::get_fps() {
-	long sampleCount = GetMediaSampleCount(m->media);
-	TimeScale timeScale = GetMediaTimeScale(m->media);
-	TimeValue duration = GetMediaDuration(m->media);
+    long sampleCount = GetMediaSampleCount(m->media);
+    TimeScale timeScale = GetMediaTimeScale(m->media);
+    TimeValue duration = GetMediaDuration(m->media);
     return float(sampleCount) * timeScale / duration;
 }
 
@@ -312,14 +312,14 @@ quicktime_recorder* quicktime_recorder::create( const char *path2, int width,
 
     m->track = NewMovieTrack(m->movie, FixRatio(m->width, 1), FixRatio(m->height, 1), kNoVolume);
     err &= GetMoviesError();
-	TimeScale timeScale = (TimeScale)(fps * 100.0f);
+    TimeScale timeScale = (TimeScale)(fps * 100.0f);
     m->media = NewTrackMedia(m->track, VideoMediaType, timeScale, nil, 0 );
     err &= GetMoviesError();
     if (err != noErr) {
         delete m; 
         return NULL;
     }
-	SetMovieTimeScale(m->movie, timeScale);
+    SetMovieTimeScale(m->movie, timeScale);
 
     m->buffer = new unsigned char[4 * m->width * m->height];
 
@@ -397,7 +397,7 @@ void quicktime_recorder::append_frame(int n) {
 
 void quicktime_recorder::finish() {
     EndMediaEdits( m->media );
-	TimeValue duration = GetMediaDuration( m->media );
+    TimeValue duration = GetMediaDuration( m->media );
     InsertMediaIntoTrack( m->track, 0, 0, duration, fixed1 );
 
     OSErr err = UpdateMovieInStorage( m->movie, m->data_handler );

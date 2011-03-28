@@ -75,9 +75,9 @@ bool MainWindow::open(const QString& fileName) {
     timeSlider->setValue(0);
 
     QImage image;
-	if (image.load(fileName)) {
-    	image = image.convertToFormat(QImage::Format_ARGB32);
-    	glw->setPixels(image.width(), image.height(), GL_BGRA_EXT, GL_UNSIGNED_BYTE, image.bits());
+    if (image.load(fileName)) {
+        image = image.convertToFormat(QImage::Format_ARGB32);
+        glw->setPixels(image.width(), image.height(), GL_BGRA_EXT, GL_UNSIGNED_BYTE, image.bits());
         m_fileName = fileName;
         return true;
     } 
@@ -207,7 +207,7 @@ void MainWindow::on_actionAbout_triggered() {
         "</li></ul>" \
         "Test image courtesy of Law Keven." \
         "</body></html>"
-	);
+    );
     msgBox.setStandardButtons(QMessageBox::Ok);
     msgBox.exec();
 }
@@ -218,7 +218,7 @@ void MainWindow::on_actionAbout_triggered() {
 void MainWindow::on_actionRecord_triggered() {
     if (!m_player) 
         return;
-	
+    
     QFileInfo fi(m_fileName);
     QString fileName = QFileDialog::getSaveFileName(this, "Record", fi.dir().filePath(fi.baseName() + "-out.mov"), 
         "QuickTime Movie (*.mov);;All files (*.*)");
@@ -278,7 +278,7 @@ void MainWindow::on_playButton_clicked() {
         m_player->stop();
         playButton->setText(">");
         timeSlider->setEnabled(true);
-    } else {		 
+    } else {         
         m_timer->start();
         m_player->start();
         playButton->setText("||");
@@ -289,7 +289,7 @@ void MainWindow::on_playButton_clicked() {
 
 void MainWindow::do_play() {
     m_player->update();
-	glw->setPixels(m_player->get_width(), m_player->get_height(),
+    glw->setPixels(m_player->get_width(), m_player->get_height(),
                        GL_BGRA_EXT, GL_UNSIGNED_BYTE, m_player->get_buffer());
     timeSlider->setValue(m_player->get_time());
 }
