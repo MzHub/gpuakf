@@ -10,8 +10,8 @@
 
 #include <cassert>
 #include "GLee.h"
-#include <QtGui/QtGui>
-#include <QtOpenGL/QtOpenGL>
+#include <QtGui>
+#include <QtOpenGL>
 
 #ifdef min
 #undef min
@@ -19,8 +19,6 @@
 #ifdef max
 #undef max
 #endif
-
-extern float perlin_original_noise3( float x, float y, float z );
 
 #endif
 #endif

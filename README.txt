@@ -20,10 +20,8 @@ Related Publications:
 
 Tested graphics cards:
 
-    NVIDIA GeForce 8800 GTX (XP)
-    NVIDIA GeForce 9800 GT (Vista x64)
-    NVIDIA GeForce 8600M GT (XP, MacOSX 10.6)
     NVIDIA Quadro FX570M (Vista x64)
+    NVIDIA GeForce 8600M GT (MacOSX 10.6)
     ATI Radeon HD 3650 (Vista x64)
     ATI Radeon HD 4350 (Vista x64)
     ATI Radeon HD 4650 (Vista x64)

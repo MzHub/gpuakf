@@ -1,8 +1,20 @@
-// Anisotropic Kuwahara Filtering on the GPU
+//
 // by Jan Eric Kyprianidis <www.kyprianidis.com>
+// Copyright (C) 2009-2011 Computer Graphics Systems Group at the
+// Hasso-Plattner-Institut, Potsdam, Germany <www.hpi3d.de>
+// 
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
 #include "glview.h"
 #include "mainwindow.h"
-#include "glslmgr.h"
 
 
 #ifndef M_PI
@@ -36,7 +48,7 @@ void GLView::initializeGL() {
         exit(1);
     }
 
-    if (!m_glslMgr->initialize()) exit(1);
+    m_glslMgr->initialize();
 
     m_jetImage = QImage(":/jet.png");
     m_jet = bindTexture(m_jetImage);
@@ -101,12 +113,25 @@ void GLView::setPixels(int w, int h, GLenum format, GLenum type, void *pixels) {
 
         float *noise = new float[w * h];
         {   
+            srand(1);
             float *p = noise;
             for (int j = 0; j < h; ++j) {
                 for (int i = 0; i < w; ++i) {
-                    *p++ = 0.5 + 1.25 * perlin_original_noise3(i/2.0, j/2.0, 0.5); 
+                    *p++ = 0.5f + 2.0f * ((float)rand() / RAND_MAX - 0.5); 
                 }
             }
+            p = noise;
+            for (int j = 0; j < h; ++j) {
+                *p++ = (3*p[0] + p[1]) / 4;
+                for (int i = 1; i < w-1; ++i) *p++ = (p[-1] + 2*p[0] + p[1]) / 4;
+                *p++ = (p[-1] + 3*p[0]) / 4;
+            }
+            p = noise;
+            for (int i = 0; i < w; ++i) *p++ = (3*p[0] + p[w]) / 4;
+            for (int j = 1; j < h-1; ++j) {
+                for (int i = 0; i < w; ++i) *p++ = (p[-w] + 2*p[0] + p[w]) / 4;
+            }
+            for (int i = 0; i < w; ++i) *p++ = (p[-w] + 3*p[0]) / 4;
         }
         glBindTexture(GL_TEXTURE_2D, m_tex[TEX_NOISE]);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE16F_ARB, w, h, 0, GL_LUMINANCE, GL_FLOAT, noise);

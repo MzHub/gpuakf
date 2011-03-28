@@ -15,8 +15,7 @@ SOURCES = \
     mainwindow.cpp \
     glview.cpp \
     glslmgr.cpp \
-    GLee.c \
-    perlin_original.cpp
+    GLee.c 
 
 FORMS = \
     mainwindow.ui \
@@ -25,8 +24,8 @@ FORMS = \
 RESOURCES = resources.qrc
 
 win32 {
-    RC_FILE = jkyprian-akf.rc
-    DEFINES += _CRT_SECURE_NO_WARNINGS _BIND_TO_CURRENT_VCLIBS_VERSION=1
+    RC_FILE = gpuakf.rc
+    DEFINES += _CRT_SECURE_NO_WARNINGS
     exists( "$$(PROGRAMFILES)/QuickTime SDK/CIncludes" ) {
         DEFINES += HAVE_QUICKTIME
         INCLUDEPATH += "$$(PROGRAMFILES)/QuickTime SDK/CIncludes"
@@ -38,9 +37,10 @@ win32 {
 }
 
 mac {
-    ICON = jkyprian-akf.icns
+    CONFIG += x86
+    ICON = gpuakf.icns
     DEFINES += HAVE_QUICKTIME
-    LIBS += -framework QuickTime
+    LIBS += -framework QuickTime -framework Carbon
     HEADERS += quicktime.h
     SOURCES += quicktime.cpp
 }

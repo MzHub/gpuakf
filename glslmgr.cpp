@@ -1,12 +1,25 @@
-// Anisotropic Kuwahara Filtering on the GPU
+//
 // by Jan Eric Kyprianidis <www.kyprianidis.com>
+// Copyright (C) 2009-2011 Computer Graphics Systems Group at the
+// Hasso-Plattner-Institut, Potsdam, Germany <www.hpi3d.de>
+// 
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
 #include "glslmgr.h"
 
 
 class Highlighter : public QSyntaxHighlighter {
 public:
     Highlighter(QTextDocument *parent) : QSyntaxHighlighter(parent) {
-	    static QStringList keywords = (QStringList()
+        static QStringList keywords = (QStringList()
             << "attribute" << "const" << "uniform" << "varying" 
             << "centroid" 
             << "break" << "continue" << "do" << "for" << "while"
@@ -24,7 +37,7 @@ public:
             << "sampler1DShadow" << "sampler2DShadow"
             << "struct"
         );
-	    static QStringList functions = (QStringList()
+        static QStringList functions = (QStringList()
             << "sin" << "cos" << "tan" 
             << "asin" << "acos" << "atan"
             << "radians" << "degrees" 
@@ -204,22 +217,23 @@ GLSLMgr::GLSLMgr(QGLWidget *parent) : QDialog(parent) {
     connect(m_copy, SIGNAL(clicked()), this, SLOT(copyToClipboard()));
 
     m_tab->clear();
-    m_logText = new QTextEdit;
+    m_logText = new QPlainTextEdit;
     QFont font("Courier");
     font.setPixelSize(10);
     m_logText->setFont(font);
     m_logText->setFrameShape(QFrame::NoFrame);
+    m_logText->setReadOnly(true);
     m_tab->addTab(m_logText, "Log");
 
-	QDir glsl_dir(":/glsl");
-	QFileInfoList glsl_list = glsl_dir.entryInfoList();
-	for (int i = 0; i < glsl_list.size(); ++i) {
-		QFileInfo fi = glsl_list[i];
-		QFile f(fi.filePath());
-		if (!f.open(QIODevice::ReadOnly | QIODevice::Text)) {
-			QMessageBox::critical(NULL, "Error", QString("Can't open %1").arg(fi.filePath()));
-			qApp->quit();
-		}
+    QDir glsl_dir(":/glsl");
+    QFileInfoList glsl_list = glsl_dir.entryInfoList();
+    for (int i = 0; i < glsl_list.size(); ++i) {
+        QFileInfo fi = glsl_list[i];
+        QFile f(fi.filePath());
+        if (!f.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            QMessageBox::critical(NULL, "Error", QString("Can't open %1").arg(fi.filePath()));
+            qApp->quit();
+        }
      
         QByteArray src = f.readAll();
         SourceEdit *code = new SourceEdit;
@@ -246,23 +260,20 @@ GLSLMgr::~GLSLMgr() {
 
 bool GLSLMgr::initialize() {
     build();
-    if (!m_buildStatus || ((m_buildStatus == 1) && m_showWarnings->isChecked())) {
-        exec();
-    }
     return m_buildStatus > 0;
 }
 
 
 void GLSLMgr::replaceInSource(const QString& pattern, const QString& text) {
-	QRegExp rx(pattern); 
-	for (int i = 0; i < m_srcText.size(); ++i) {
-		QString name = m_srcText[i]->documentTitle();
-		QString src = m_srcText[i]->toPlainText();
-		src.replace(rx, text);
-		m_srcText[i]->setPlainText(src);
-		m_srcText[i]->setDocumentTitle(name);
-	}
-	build();
+    QRegExp rx(pattern); 
+    for (int i = 0; i < m_srcText.size(); ++i) {
+        QString name = m_srcText[i]->documentTitle();
+        QString src = m_srcText[i]->toPlainText();
+        src.replace(rx, text);
+        m_srcText[i]->setPlainText(src);
+        m_srcText[i]->setDocumentTitle(name);
+    }
+    build();
 }
 
 
@@ -278,54 +289,25 @@ void GLSLMgr::build() {
 
     for (int i = 0; i < m_srcText.size(); ++i) {
         QString name = m_srcText[i]->documentTitle();
-        QByteArray src = m_srcText[i]->toPlainText().toLatin1();
+        QString src = m_srcText[i]->toPlainText();
 
-        m_log += QString("---- %1 ----\n").arg(name);
-		{
-			GLuint shader_id = glCreateShader(GL_FRAGMENT_SHADER);
-			const char* src_ptr = src.data();
-			const GLint src_len = src.length();
-            glShaderSource(shader_id, 1, &src_ptr, &src_len);
-			glCompileShader(shader_id);
+        m_log += QString("Compiling/Linking: %1\n").arg(name);
 
-			GLint len;
-			glGetShaderiv(shader_id, GL_INFO_LOG_LENGTH, &len);
-			if (len > 1) {
-				char *buf = new char[len];
-				glGetShaderInfoLog(shader_id, len, NULL, buf);
-                m_log += QString("Compiling:\n");
-                m_log += QString("%1\n").arg(buf);
-				delete buf;
-			}
+        QGLShaderProgram *prog = new QGLShaderProgram(this);
+        if (prog->addShaderFromSourceCode(QGLShader::Fragment, src)) {
+            prog->link();
+        }
+        if (prog->isLinked()) {
+            m_prog[name] = prog;
+        } else {
+            m_buildStatus = 0;
+        }
+        if (!prog->log().isEmpty()) {
+            m_log += prog->log();
+        }
 
-			GLint compile_status;
-			glGetShaderiv(shader_id, GL_COMPILE_STATUS, &compile_status);
-            if (!compile_status)
-                m_buildStatus = 0;
-			
-            if (compile_status) {
-				GLuint prog_id = glCreateProgram();
-				m_pid[name] = prog_id;
-				glAttachShader(prog_id, shader_id);
-				glLinkProgram(prog_id);
-
-				GLint len = 0;
-				glGetProgramiv(prog_id, GL_INFO_LOG_LENGTH, &len);
-				if (len > 1) {
-					char *buf = new char[len];
-					glGetProgramInfoLog(prog_id, len, NULL, buf);
-                    m_log += QString("Linking:\n");
-                    m_log += QString("%1\n").arg(buf);
-					delete buf;
-				}
-
-				GLint link_status;
-				glGetProgramiv(prog_id, GL_LINK_STATUS, &link_status);
-				if (!link_status) m_buildStatus = 0;
-			}
-		}
         m_log += "\n";
-	}
+    }
 
     if (m_buildStatus && m_log.contains("warning", Qt::CaseInsensitive)) {
         m_buildStatus = 1;

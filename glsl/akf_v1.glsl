@@ -1,8 +1,5 @@
-// Anisotropic Kuwahara Filtering on the GPU
 // by Jan Eric Kyprianidis <www.kyprianidis.com>
-#version 120
 #extension GL_EXT_gpu_shader4 : enable
-
 uniform sampler2D src;
 uniform sampler2D K0;
 uniform sampler2D tfm;
